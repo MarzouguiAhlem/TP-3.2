@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private WordListAdapter mAdapter;
     private Datasource mDataSource;
+    private LinkedList<Word> mWordList ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,17 +40,27 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(binding.toolbar);
 
 
+        mDataSource= new Datasource() ;
+        LinkedList<Word> mWordList = mDataSource.loadWords();
         binding.fab.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAnchorView(R.id.fab)
-                        .setAction("Action", null).show();
+                int wordListSize = mWordList.size();
+
+                // Ajoutez un nouveau mot à la liste de mots.
+                mWordList.addLast(new Word("+ Word " + wordListSize));
+
+                // Notifiez l'adaptateur qu'une nouvelle donnée a été insérée.
+                binding.contentMain.recyclerview.getAdapter().notifyItemInserted(wordListSize);
+
+                // Faites défiler jusqu'en bas
+                binding.contentMain.recyclerview.smoothScrollToPosition(wordListSize);
             }
         });
-        mDataSource= new Datasource() ;
+
         // Charger la liste des mots
-        LinkedList<Word> mWordList = mDataSource.loadWords();
+
 // Créer une instance de l'adaptateur en passant la liste des mots comme paramètre
         mAdapter = new WordListAdapter(mWordList);
 // Lier RecyclerView à son adaptateur
